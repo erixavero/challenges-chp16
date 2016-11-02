@@ -2,56 +2,73 @@
 using namespace std;
 
 class TestScores{
-	double scores[];
+	double *aptr;
 	int size;
-	double total;
 	
 public:
 	
-	TestScores(){};
-	
-	TestScores(double scores[], int size){
+	TestScores(int size){
 		this->size = size;
+		aptr = new double [size];
+		for(int i=0;i<size;i++){
+			*(aptr + i) = 0;
+		}
 		
+	};
+	
+	TestScores(TestScores &ting){
+		this->size = ting.size;
+		aptr = new double [size];
 		for(int i=0; i<size; i++){
-			this->scores[i] = scores[i];
+			*(aptr + i) = *(ting.aptr + i);
 		}
 	}
 	
 	class InvalidScore{};
 	
-	double setScores(double scores[]){
-		if(*scores<0 || *scores>100){
+	double setScores(TestScores &ting){
+			for(int i=0; i<size; i++){
+				if(*(ting.aptr + i)<0 || *(ting.aptr + i)>100){
+					throw InvalidScore();
+				}
+				else{
+				*(aptr + i) = *(ting.aptr + i);
+				}
+		}
+		
+	}
+	
+	double countAvg(){
+		double total;
+		for(int i=0; i<size; i++){
+			total += *(aptr + i);
+		}
+		return total/size;
+	}
+	
+	int operator[](int &arse){
+		if(arse<0 || arse >= size){
 			throw InvalidScore();
 		}
 		else{
-			for(int i=0; i<size; i++){
-			this->scores[i] = scores[i];
+			return aptr[arse];
 		}
-		}
-	}
-	
-	double countTotal(){
-		for(int i=0; i<size;i++){
-			total += scores[i];
-		}
-		return total;
-	}
-	
-	double getAvg(){
-		return total/size;
 	}
 };
 
 int main(){
-	double scores[5];
-	for(int i=0; i<5; i++){
-		cout<<"Insert test score " <<i+1 <<": "; cin>>scores[i];
-	}
+	int size= 5;
+	double score;
+	
 	try{
-	TestScores student(scores, 5);
-	student.countTotal();
-	cout<<"Average score: " <<student.getAvg();
+	TestScores student(size);
+	
+	for(int i=0;i<size;i++){
+		cout<<"Insert test score " <<i+1 <<": "; cin>>score;
+		score = student[i];
+	}
+	
+	cout<<"Average score: " <<student.countAvg();
 	} 
 	catch (TestScores::InvalidScore){
 		cout<<"Invalid score";
